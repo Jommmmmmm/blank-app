@@ -11,7 +11,6 @@ import seaborn as sns
 
 st.set_page_config(layout='wide')
 
-# Data Generation
 def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_range, rainfall_range):
     np.random.seed(42)
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -21,6 +20,9 @@ def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_rang
     if len(day) < n_samples:
         day = np.concatenate([day, days[:n_samples - len(day)]])  # Ensure we match the exact number of samples
     
+    # Debugging: Display the first few days to ensure proper order
+    print("Days sequence (first few entries):", day[:10])  # Output first 10 for inspection
+    
     # Assign random values to the weather parameters
     temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
     humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
@@ -28,6 +30,7 @@ def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_rang
     rainfall = np.random.uniform(rainfall_range[0], rainfall_range[1], n_samples)
     weather_condition = np.random.choice(['Sunny', 'Cloudy', 'Rainy'], n_samples, p=[0.6, 0.3, 0.1])
     
+    # Create DataFrame with weather data
     data = pd.DataFrame({
         'Day': day,
         'Temperature (°C)': temperature,
@@ -39,7 +42,6 @@ def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_rang
     
     return data
 
-# Data Preprocessing
 def preprocess_data(data):
     scaler = StandardScaler()
     scaled_features = scaler.fit_transform(data[['Temperature (°C)', 'Humidity (%)', 'Wind Speed (km/h)', 'Rainfall (mm)']])
@@ -48,7 +50,6 @@ def preprocess_data(data):
     st.write(data.head())
     return data
 
-# Display Model Metrics
 def display_metrics(y_true, y_pred, model_name):
     mse = mean_squared_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
@@ -60,7 +61,6 @@ def display_metrics(y_true, y_pred, model_name):
     st.write(f"Mean Absolute Error (MAE): {mae:.2f}")
     return mse, r2, mae
 
-# Exploratory Data Analysis (EDA)
 def perform_eda(data):
     st.subheader("Exploratory Data Analysis")
     col1, col2 = st.columns(2)
@@ -90,7 +90,6 @@ def perform_eda(data):
     ax.set_title("Feature Correlation Heatmap")
     st.pyplot(fig)
 
-# Streamlit UI Configuration
 st.title("Weather Data Generator and Predictor")
 
 # Sidebar inputs for synthetic data generation
