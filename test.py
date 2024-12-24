@@ -11,6 +11,32 @@ import seaborn as sns
 
 st.set_page_config(layout='wide')
 
+# Data Generation
+def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_range, rainfall_range):
+    np.random.seed(42)
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    
+    # Ensure all days are represented in the dataset
+    day = np.tile(days, n_samples // len(days))  # Repeat the list to match n_samples
+    day = np.random.permutation(day)  # Shuffle to ensure randomness
+    temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
+    humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
+    wind_speed = np.random.uniform(wind_speed_range[0], wind_speed_range[1], n_samples)
+    rainfall = np.random.uniform(rainfall_range[0], rainfall_range[1], n_samples)
+    weather_condition = np.random.choice(['Sunny', 'Cloudy', 'Rainy'], n_samples, p=[0.6, 0.3, 0.1])
+    
+    data = pd.DataFrame({
+        'Day': day,
+        'Temperature (°C)': temperature,
+        'Humidity (%)': humidity,
+        'Wind Speed (km/h)': wind_speed,
+        'Rainfall (mm)': rainfall,
+        'Weather Condition': weather_condition
+    })
+    
+    return data
+
+# Data Preprocessing
 def preprocess_data(data):
     scaler = StandardScaler()
     scaled_features = scaler.fit_transform(data[['Temperature (°C)', 'Humidity (%)', 'Wind Speed (km/h)', 'Rainfall (mm)']])
@@ -19,27 +45,7 @@ def preprocess_data(data):
     st.write(data.head())
     return data
 
-def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_range, rainfall_range):
-    np.random.seed(42)
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    
-    # Ensure all days are evenly represented in the dataset
-    day = np.random.choice(days, n_samples, replace=True)
-    temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
-    humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
-    wind_speed = np.random.uniform(wind_speed_range[0], wind_speed_range[1], n_samples)
-    rainfall = np.random.uniform(rainfall_range[0], rainfall_range[1], n_samples)
-    weather_condition = np.random.choice(['Sunny', 'Cloudy', 'Rainy'], n_samples, p=[0.6, 0.3, 0.1])
-    
-    return pd.DataFrame({
-        'Day': day,
-        'Temperature (°C)': temperature,
-        'Humidity (%)': humidity,
-        'Wind Speed (km/h)': wind_speed,
-        'Rainfall (mm)': rainfall,
-        'Weather Condition': weather_condition
-    })
-
+# Display Model Metrics
 def display_metrics(y_true, y_pred, model_name):
     mse = mean_squared_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
@@ -51,6 +57,7 @@ def display_metrics(y_true, y_pred, model_name):
     st.write(f"Mean Absolute Error (MAE): {mae:.2f}")
     return mse, r2, mae
 
+# Exploratory Data Analysis (EDA)
 def perform_eda(data):
     st.subheader("Exploratory Data Analysis")
     col1, col2 = st.columns(2)
@@ -80,6 +87,7 @@ def perform_eda(data):
     ax.set_title("Feature Correlation Heatmap")
     st.pyplot(fig)
 
+# Streamlit UI Configuration
 st.title("Weather Data Generator and Predictor")
 
 # Sidebar inputs for synthetic data generation
