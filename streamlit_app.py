@@ -13,7 +13,7 @@ st.set_page_config(
     layout="wide"
 )
 
-def generate_synthetic_data(
+def generate_weather_data(
     n_samples, 
     avg_marketing_spend, 
     std_marketing_spend, 
