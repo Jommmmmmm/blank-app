@@ -17,36 +17,24 @@ st.set_page_config(
 def generate_weather_data(n_samples, temp_range, humidity_range, wind_range, precip_range):
     np.random.seed(42)
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    day = np.random.choice(days, n_samples)
-    temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
-    humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
-    wind_speed = np.random.uniform(wind_range[0], wind_range[1], n_samples)
-    precipitation = np.random.uniform(precip_range[0], precip_range[1], n_samples)
+    data_list = []  # List to hold data for each day
     
-    # Add a target variable (e.g., temperature or weather condition)
-    future_temp = temperature + np.random.normal(0, 3, n_samples)  # Predict temperature
-    data = pd.DataFrame({
-        'Day': day,
-        'Temperature (°C)': temperature,
-        'Humidity (%)': humidity,
-        'Wind Speed (km/h)': wind_speed,
-        'Precipitation (mm)': precipitation,
-        'Future Temperature (°C)': future_temp
-    })
-    
-    # Ensure data covers all days from Monday to Sunday
-    all_days = pd.DataFrame(columns=data.columns)
     for day_name in days:
-        day_data = data[data['Day'] == day_name]
-        if day_data.empty:
-            # If no data for the day, create synthetic data for the day
-            n_missing = 1  # Ensure at least one sample for each day
-            day_data = generate_weather_data(n_samples=n_missing, temp_range=temp_range, 
-                                             humidity_range=humidity_range, wind_range=wind_range, 
-                                             precip_range=precip_range)
-            day_data['Day'] = day_name
-        all_days = pd.concat([all_days, day_data], ignore_index=True)
+        # Generate data for each day
+        day_data = pd.DataFrame({
+            'Day': [day_name] * n_samples,
+            'Temperature (°C)': np.random.uniform(temp_range[0], temp_range[1], n_samples),
+            'Humidity (%)': np.random.uniform(humidity_range[0], humidity_range[1], n_samples),
+            'Wind Speed (km/h)': np.random.uniform(wind_range[0], wind_range[1], n_samples),
+            'Precipitation (mm)': np.random.uniform(precip_range[0], precip_range[1], n_samples),
+        })
+        # Add a target variable (e.g., temperature or weather condition)
+        day_data['Future Temperature (°C)'] = day_data['Temperature (°C)'] + np.random.normal(0, 3, n_samples)
+        
+        data_list.append(day_data)  # Add each day's data to the list
     
+    # Combine all days into one DataFrame
+    all_days = pd.concat(data_list, ignore_index=True)
     return all_days
 
 # EDA
