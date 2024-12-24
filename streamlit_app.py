@@ -17,7 +17,9 @@ st.set_page_config(
 def generate_weather_data(n_samples, temp_range, humidity_range, wind_range, precip_range):
     np.random.seed(42)
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    day = np.random.choice(days, n_samples)
+    
+    # Ensure all days are evenly represented in the dataset
+    day = np.random.choice(days, n_samples, replace=True)
     temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
     humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
     wind_speed = np.random.uniform(wind_range[0], wind_range[1], n_samples)
