@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ def generate_weather_data(n_samples, temp_range, humidity_range, wind_range, pre
     
     # Add a target variable (e.g., temperature or weather condition)
     future_temp = temperature + np.random.normal(0, 3, n_samples)  # Predict temperature
-    return pd.DataFrame({
+    data = pd.DataFrame({
         'Day': day,
         'Temperature (°C)': temperature,
         'Humidity (%)': humidity,
@@ -33,6 +33,21 @@ def generate_weather_data(n_samples, temp_range, humidity_range, wind_range, pre
         'Precipitation (mm)': precipitation,
         'Future Temperature (°C)': future_temp
     })
+    
+    # Ensure data covers all days from Monday to Sunday
+    all_days = pd.DataFrame(columns=data.columns)
+    for day_name in days:
+        day_data = data[data['Day'] == day_name]
+        if day_data.empty:
+            # If no data for the day, create synthetic data for the day
+            n_missing = 1  # Ensure at least one sample for each day
+            day_data = generate_weather_data(n_samples=n_missing, temp_range=temp_range, 
+                                             humidity_range=humidity_range, wind_range=wind_range, 
+                                             precip_range=precip_range)
+            day_data['Day'] = day_name
+        all_days = pd.concat([all_days, day_data], ignore_index=True)
+    
+    return all_days
 
 # EDA
 def perform_eda(data):
