@@ -16,9 +16,12 @@ def generate_weather_data(n_samples, temp_range, humidity_range, wind_speed_rang
     np.random.seed(42)
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     
-    # Ensure all days are represented in the dataset
-    day = np.tile(days, n_samples // len(days))  # Repeat the list to match n_samples
-    day = np.random.permutation(day)  # Shuffle to ensure randomness
+    # Repeat the days in sequence to match the number of samples
+    day = np.tile(days, n_samples // len(days))  # Repeat the sequence
+    if len(day) < n_samples:
+        day = np.concatenate([day, days[:n_samples - len(day)]])  # Ensure we match the exact number of samples
+    
+    # Assign random values to the weather parameters
     temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
     humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
     wind_speed = np.random.uniform(wind_speed_range[0], wind_speed_range[1], n_samples)
