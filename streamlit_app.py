@@ -13,26 +13,43 @@ st.set_page_config(
     layout="wide"
 )
 
-# Generate Synthetic Weather Data
-def generate_weather_data(n_samples, temp_range, humidity_range, wind_range, precip_range):
+def generate_synthetic_data(
+    n_samples, 
+    avg_marketing_spend, 
+    std_marketing_spend, 
+    min_discount, 
+    max_discount, 
+    competitor_price_min, 
+    competitor_price_max
+):
+    """
+    Generate synthetic weather data ensuring all days (Monday to Sunday) are included.
+    """
     np.random.seed(42)
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    day = np.random.choice(days, n_samples)
-    temperature = np.random.uniform(temp_range[0], temp_range[1], n_samples)
-    humidity = np.random.uniform(humidity_range[0], humidity_range[1], n_samples)
-    wind_speed = np.random.uniform(wind_range[0], wind_range[1], n_samples)
-    precipitation = np.random.uniform(precip_range[0], precip_range[1], n_samples)
     
-    # Add a target variable (e.g., temperature or weather condition)
-    future_temp = temperature + np.random.normal(0, 3, n_samples)  # Predict temperature
+    # Generate data such that all days are covered
+    day = np.tile(days, n_samples // len(days))  # Repeat days to ensure all are included
+    remaining_samples = n_samples % len(days)
+    day = np.concatenate([day, np.random.choice(days, remaining_samples, replace=False)])
+    
+    discount = np.random.uniform(min_discount, max_discount, n_samples)
+    marketing_spend = np.random.normal(avg_marketing_spend, std_marketing_spend, n_samples)
+    competitor_price = np.random.uniform(competitor_price_min, competitor_price_max, n_samples)
+    
+    # Base sales calculation (you can modify this for weather-specific logic)
+    base_sales = 50 + marketing_spend / 1000 - discount / 2
+    sales_count = np.random.poisson(base_sales).clip(min=0)
+    
+    # Create the DataFrame
     return pd.DataFrame({
         'Day': day,
-        'Temperature (°C)': temperature,
-        'Humidity (%)': humidity,
-        'Wind Speed (km/h)': wind_speed,
-        'Precipitation (mm)': precipitation,
-        'Future Temperature (°C)': future_temp
+        'Discount (%)': discount,
+        'Marketing Spend ($)': marketing_spend,
+        'Competitor Price ($)': competitor_price,
+        'Sales Count': sales_count
     })
+
 
 # EDA
 def perform_eda(data):
